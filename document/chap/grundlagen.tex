@@ -1,0 +1,49 @@
+\chapter{Grundlagen}
+
+\section{Datenbankverwaltungssysteme}
+
+Einer der wichtigsten Aspekte einer Datenbankanwendung ist die Performance. 
+
+Mit der Zeit wird es auf der Welt immer wichtiger große Mengen an Daten mithilfe einer Datenbank persistieren und verarbeiten zu können.
+In Bezug auf den Speicher kann hier unterschieden werden zwischen einer In-Memory Datenbank,wie beispielsweise Redis oder H2 und einer On-Disk Datenbank,wie Postgresql,welche auf dem Sekundärspeicher operiert. \\
+
+In-Memory Datenbanken haben den Vorteil, dass diese eine geringe Latenz bei Anfragen und Operationen vorweisen, da die Daten sich schon im Hauptspeicher befinden. Bei einer On-Disk Datenbank muss der benötigte Speicher bei einer Anfrage erst in den Hauptspeicher aus dem Sekundärspeicher geladen werden und dieser Vorgang benötigt Zeit.\cite{KABAKUS2017520}
+
+
+\subsection{Reihen-orientierter Speicher vs Spalten-orientierter Speicher}
+Bei der Performance spielt auch eine große Rolle,in welchem Format die Daten in den Speicher gelegt werden. Hier wird unterschieden zwischen dem Reihen-orientierten und dem Spalten-orientierten Speicherformat.
+Die meisten traditionellen Datenbankverwaltungssysteme benutzen ein Reihen-orientiertes Speicherformat, welches Datentupel aus den Reihen hintereinander im Speicher persistiert. Solch ein System ist laut \cite{Stonebraker2005CStoreAC} ein "Schreib-optimiertes System".
+
+Grafik
+
+Bei einem Spalte-orientierten Datenbanksystem, werden keine Dateneinträge hintereinander im Speicher persistiert, sondern die Einträgen spaltenweise pro Eintrag nacheinander in den Speicher gelegt. In der Grafik sieht man, dass jede ID eines Eintrags hintereinander im Speicher liegt. Auf diese Weise können auf größeren Datensätzen schnellere Funktionen auf einzelne Einträge ausgeführt werden, ohne dass Daten, die nicht benötigt werden,mitgeladen werden müssen.
+
+Im Gegensatz dazu gleicht der Ansatz eines Spalten-Orientierten Datenbankspeicher-Layouts diesen Performanceverlust aus. 
+Da die Daten eines Objektes hier Spaltenweise persistiert werden können Operationen auf langen Spalten sehr performant ausgeführt werden.
+
+Grafik
+
+Aufgrund dieser Vorteile wird in dieser Arbeit ausschließlich eine In-Memory Datenbank mit einem Spalten-Orientierten Speicher behandelt.
+Um mit diesem Spalten-Orientierten Format zu arbeiten wird, Apache Arrow in dieser Arbeit benutzt.
+
+\section{Apache Arrow}
+
+Apache Arrow ist ein Framework, welches ein Sprachen-unabhängiges Spalten-orientiertes Speicherformat definiert. 
+Um Arrow nutzen zu können stellt Apache, in verschiedene Sprachen Bindings zu Verfügung. In dieser Arbeit wird die Programmiersprache Java benutzt.
+Arrow umgeht das Problem, dass jede Sprache eine unterschiedliche Serialisierung und Deserialisierung von Daten im Speicher und in der Übertragung von Daten über das Netzwerk,unterstützt.
+Das Framework vereinheitlicht die Serialisierung und Deserialisierung indem es sämtliche Objekte unter der Haube als Buffer interpretiert.
+Auf ArrowBuffer wird im Hauptteil eingegangen.
+
+
+\section{Serialisierung und Deserialisierung}
+
+Was ist das?
+
+\section{Gandiva}
+
+
+ 
+
+
+
+(https://db.in.tum.de/teaching/ws1718/seminarHauptspeicherdbs/paper/sterjo.pdf?lang=de)
