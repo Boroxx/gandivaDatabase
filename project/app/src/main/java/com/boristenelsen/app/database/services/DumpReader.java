@@ -18,12 +18,9 @@ public class DumpReader {
         this.dumpFile = dumpFile;
     }
 
+
+
     public void initDatabase() throws IOException, JSQLParserException {
-        analyseDumpSchema();
-
-    }
-
-    private void analyseDumpSchema() throws IOException, JSQLParserException {
         Scanner scanner = new Scanner(dumpFile);
         scanner.useDelimiter(";");
         while(scanner.hasNext()){
@@ -32,10 +29,16 @@ public class DumpReader {
             System.out.println("New Loop");
             //Ueberpruefe statement auf Create Table Statement.
             if(SqlUtil.isCreateTableStmt(statement)){
-                dumpSchema = SqlUtil.parseCreateTableStmt(statement);
-                return;
+                this.dumpSchema = SqlUtil.parseCreateTableStmt(statement);
+                break;
             }
+            if(SqlUtil.isInsertStmt(statement)){
+
+            }
+
 
         }
     }
+
+
 }
