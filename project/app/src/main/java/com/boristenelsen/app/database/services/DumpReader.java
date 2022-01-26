@@ -1,5 +1,6 @@
 package com.boristenelsen.app.database.services;
 
+import com.boristenelsen.app.database.models.Table;
 import com.boristenelsen.app.database.utils.SqlUtil;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -13,6 +14,7 @@ public class DumpReader {
 
     private File dumpFile;
     private Schema dumpSchema;
+    private Table table;
 
     public DumpReader(File dumpFile){
         this.dumpFile = dumpFile;
@@ -25,15 +27,17 @@ public class DumpReader {
         scanner.useDelimiter(";");
         while(scanner.hasNext()){
             String statement = scanner.next();
+            if(statement.equals("\n"))break;
             System.out.println(statement);
             System.out.println("New Loop");
             //Ueberpruefe statement auf Create Table Statement.
             if(SqlUtil.isCreateTableStmt(statement)){
                 this.dumpSchema = SqlUtil.parseCreateTableStmt(statement);
-                break;
+                table = new Table(this.dumpSchema);
+
             }
             if(SqlUtil.isInsertStmt(statement)){
-
+                SqlUtil.prepareDataForMemory(statement,table);
             }
 
 
