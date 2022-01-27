@@ -13,8 +13,7 @@ import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.insert.Insert;
-import org.apache.arrow.vector.IntVector;
-import org.apache.arrow.vector.VectorSchemaRoot;
+import org.apache.arrow.vector.*;
 import org.apache.arrow.vector.types.pojo.ArrowType;
 import org.apache.arrow.vector.types.pojo.Field;
 import org.apache.arrow.vector.types.pojo.FieldType;
@@ -26,7 +25,7 @@ import java.util.List;
 
 public class SqlUtil {
 
-    public static Schema parseCreateTableStmt(String stmt) throws JSQLParserException {
+    public static Table parseCreateTableStmt(String stmt) throws JSQLParserException {
         Statement parse = CCJSqlParserUtil.parse(stmt);
         CreateTable ct = (CreateTable) parse;
         System.out.println("table=" + ct.getTable().getFullyQualifiedName());
@@ -34,7 +33,6 @@ public class SqlUtil {
         List<Field> fieldList = new ArrayList<>();
 
         for (ColumnDefinition colDef : ct.getColumnDefinitions()) {
-            System.out.println("column=" + colDef.getColumnName() + " " + colDef.getColDataType() + " ");
             try {
                 Field parsedField = prepareField(colDef.getColumnName(), colDef.getColDataType().toString());
                 fieldList.add(parsedField);
@@ -44,7 +42,7 @@ public class SqlUtil {
         }
 
 
-        return new Schema(fieldList);
+        return new Table(new Schema(fieldList));
 
 
     }
@@ -64,7 +62,7 @@ public class SqlUtil {
     }
 
     // Parse SQL-Statement in ein Schema welches für Apache Arrow zugeschnitten ist. Dieses Schema wird später für die Klasse VectorSchemaRoot benötigt.
-    public static void prepareDataForMemory(String stmt,Table table) throws JSQLParserException {
+    public static void prepareDataForMemory(String stmt,Table table) throws Exception {
         Statement parse = CCJSqlParserUtil.parse(stmt);
         Insert insert = (Insert) parse;
         insert.getColumns().stream().forEach(System.out::println);
@@ -83,10 +81,18 @@ public class SqlUtil {
                 System.out.println(table.vectorSchemaRoot.getFieldVectors().size());
 
                 ((IntVector) table.vectorSchemaRoot.getVector("id")).setSafe(table.getCounter(),table.getCounter());
+                //Iteriere über jeden einzelnen Wert in der Expression und fülle diesen Wert in die richtige Spalte. Anders gesagt fülle Apache Arrow Table mit Daten aus SQLDump
+                for(int i=0; i <  columns.size();i++){
+                    Column col = columns.get(i);
+                    String colName = col.getColumnName();
+                    String fieldType = table.vectorSchemaRoot.getVector(colName).getField().getType().toString();
 
-                //Speichere Daten mithilfe von Arrow Pojo, dazu wird aus dem Schema der Datentyp geladen
-                for(Column column: columns){
-                  //Für jede Col soll ein Item aus der Expression im Table mithilfe von vectorSchemaRoot gespeichert werden.
+                    if(fieldType.startsWith("Int")){
+                        ((UInt4Vector) table.vectorSchemaRoot.getVector(colName)).setSafe(table.getCounter(),Integer.parseInt(exp.get(i).toString()));
+                    }else if(fieldType.startsWith("Utf8")){
+                        ((VarCharVector) table.vectorSchemaRoot.getVector(colName)).setSafe(table.getCounter(),exp.get(i).toString().getBytes());
+                    }else throw new Exception();
+
                 }
                 //Am Ende wir der Table counter erhöht damit an den richtigen Index geschrieben werden kann.
                 table.incrementCounter();
@@ -112,7 +118,14 @@ public class SqlUtil {
      Um die Daten dann mithilfe von vectorSchemaRoot speichern zu können, benötigen wir die nötige BaseValueVectorKlasse.
      Das heißt wir haben ArrowType und brauchen basierend darauf eine BaseValueVector-Klasse um die Daten in Memory zulegen.
      */
-    public static DataType getDataTypeFromFieldType(){
-        return null;
+    public static Class getDataTypeFromFieldType(FieldVector fieldVector) throws Exception {
+        if(fieldVector.getField().getType().toString().startsWith("Int")){
+            return IntVector.class;
+        }
+        else if(fieldVector.getField().getType().toString().startsWith("Varchar")){
+            return VarCharVector.class;
+        }
+        else throw new Exception();
+
     }
 }

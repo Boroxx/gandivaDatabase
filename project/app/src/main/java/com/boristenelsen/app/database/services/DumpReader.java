@@ -28,16 +28,18 @@ public class DumpReader {
         while(scanner.hasNext()){
             String statement = scanner.next();
             if(statement.equals("\n"))break;
-            System.out.println(statement);
-            System.out.println("New Loop");
-            //Ueberpruefe statement auf Create Table Statement.
-            if(SqlUtil.isCreateTableStmt(statement)){
-                this.dumpSchema = SqlUtil.parseCreateTableStmt(statement);
-                table = new Table(this.dumpSchema);
 
+            //Ueberpruefe statement auf Create Table Statement und erstelle Table aus SQLDump.
+            if(SqlUtil.isCreateTableStmt(statement)){
+                table = SqlUtil.parseCreateTableStmt(statement);
             }
+            //Fülle für jeden Insert SQL-Dump
             if(SqlUtil.isInsertStmt(statement)){
-                SqlUtil.prepareDataForMemory(statement,table);
+                try {
+                    SqlUtil.prepareDataForMemory(statement,table);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
 
