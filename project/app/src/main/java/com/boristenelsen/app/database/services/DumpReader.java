@@ -25,6 +25,7 @@ public class DumpReader {
     public void initDatabase() throws IOException, JSQLParserException {
         Scanner scanner = new Scanner(dumpFile);
         scanner.useDelimiter(";");
+
         while(scanner.hasNext()){
             String statement = scanner.next();
             if(statement.equals("\n"))break;
@@ -41,9 +42,16 @@ public class DumpReader {
                     e.printStackTrace();
                 }
             }
-
-
         }
+
+        Runtime runtime = Runtime.getRuntime();
+        runtime.gc();
+        long memory = runtime.totalMemory() - runtime.freeMemory();
+        System.out.println("Benutzer Speicher in Bytes: " + memory);
+        System.out.println("Benutzer Speicher in MB: " + bytesToMegabytes(memory));
+    }
+    public static long bytesToMegabytes(long bytes) {
+        return bytes / (1024L * 1024L);
     }
 
 

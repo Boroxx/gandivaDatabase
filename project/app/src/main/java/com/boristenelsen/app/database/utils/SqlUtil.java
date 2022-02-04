@@ -42,7 +42,7 @@ public class SqlUtil {
         }
 
 
-        return new Table(new Schema(fieldList));
+        return new Table(new Schema(fieldList),fieldList);
 
 
     }
@@ -76,22 +76,22 @@ public class SqlUtil {
                 List<Expression> exp = expressionList.getExpressions();
                 List <Column> columns = insert.getColumns();
 
-                System.out.println(exp.get(0));
-                System.out.println(insert.getColumns().size());
-                System.out.println(table.vectorSchemaRoot.getFieldVectors().size());
-
-                ((IntVector) table.vectorSchemaRoot.getVector("id")).setSafe(table.getCounter(),table.getCounter());
+                //Pro Eintrag muss sich der Index automatisch erhöhen
+                ((UInt4Vector) table.vectorSchemaRoot.getVector("`id`")).setSafe(table.getCounter(),table.getCounter());
                 //Iteriere über jeden einzelnen Wert in der Expression und fülle diesen Wert in die richtige Spalte. Anders gesagt fülle Apache Arrow Table mit Daten aus SQLDump
                 for(int i=0; i <  columns.size();i++){
                     Column col = columns.get(i);
                     String colName = col.getColumnName();
-                    String fieldType = table.vectorSchemaRoot.getVector(colName).getField().getType().toString();
+                    FieldVector field = table.vectorSchemaRoot.getVector(colName);
 
-                    if(fieldType.startsWith("Int")){
+                    if(field instanceof UInt4Vector){
                         ((UInt4Vector) table.vectorSchemaRoot.getVector(colName)).setSafe(table.getCounter(),Integer.parseInt(exp.get(i).toString()));
-                    }else if(fieldType.startsWith("Utf8")){
+                        MemoryUtil.printLongAsAdress(table.vectorSchemaRoot.getVector(colName).getDataBufferAddress());
+                    }else if(field instanceof  VarCharVector){
                         ((VarCharVector) table.vectorSchemaRoot.getVector(colName)).setSafe(table.getCounter(),exp.get(i).toString().getBytes());
-                    }else throw new Exception();
+                        MemoryUtil.printLongAsAdress(table.vectorSchemaRoot.getVector(colName).getDataBufferAddress());
+                    }
+                    else throw new Exception();
 
                 }
                 //Am Ende wir der Table counter erhöht damit an den richtigen Index geschrieben werden kann.
