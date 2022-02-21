@@ -42,11 +42,11 @@ public class StatementController {
         return new ResponseEntity<String>("Datenbank wurde erfolgreich initialisiert",HttpStatus.CREATED);
     }
     @PostMapping("/statement")
-    public ResponseEntity<IndexResponse> sendStatement(@RequestBody Statement statement){
+    public ResponseEntity<IndexResponse> sendStatement(@RequestBody Statement statement) throws JSQLParserException {
 
         //Prüfe ob überhaupt ein Table-Objekt initiliasiert wurde ansonsten return Error
-        //parse Statement through SqlMethodProvider
-
-        return new ResponseEntity<IndexResponse>(new IndexResponse(null,null,null), HttpStatus.OK);
+        //parse Statement through SqlMethodPicker
+        IndexResponse  indexResponse = sqlMethodProvider.checkStatementToMethod(statement,dumpReader.getTable());
+        return new ResponseEntity<IndexResponse>(indexResponse, HttpStatus.OK);
     }
 }

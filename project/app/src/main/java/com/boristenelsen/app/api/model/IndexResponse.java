@@ -10,7 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class IndexResponse {
-    public String memoryAdress;
+    public List<String> memoryAdress;
     public List<Integer> offsets;
     public List<String> types;
 

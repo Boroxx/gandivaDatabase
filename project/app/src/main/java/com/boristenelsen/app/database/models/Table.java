@@ -17,6 +17,9 @@ public class Table {
     public List<Field> fieldList;
     List<DataType> schemaDictionary;
 
+    public Table(){
+
+    }
     public Table(Schema schema, List<Field>fieldList) {
         allocator = new RootAllocator(Long.MAX_VALUE);
         vectorSchemaRoot = VectorSchemaRoot.create(schema, allocator);
