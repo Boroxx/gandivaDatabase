@@ -1,5 +1,6 @@
 package com.boristenelsen.app.database.models;
 
+import com.boristenelsen.app.database.utils.MemoryUtil;
 import com.boristenelsen.app.enums.DataType;
 import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.FieldVector;
@@ -37,7 +38,25 @@ public class Table {
         this.counter++;
     }
 
-    public void printTable(){
+    public Field getFieldByName(String colName){
+        for(Field field : this.fieldList){
+            if(field.getName().equals(colName)){
+                return field;
+            }
+        }
+        return null;
+    }
+    public String getMemoryadress(String colName){
+        for(FieldVector fieldVector : vectorSchemaRoot.getFieldVectors()){
+            if(fieldVector.getName().equals(colName)){
+                return Long.toHexString(fieldVector.getDataBufferAddress());
+            }
+        }
+        return null;
+    }
+
+    public int getRowSize(){
+        return counter;
     }
 
 

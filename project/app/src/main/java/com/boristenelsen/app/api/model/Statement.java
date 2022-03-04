@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class Statement {
-    String statement;
+    private String statement;
 }

@@ -5,6 +5,7 @@ import com.boristenelsen.app.api.model.Statement;
 import com.boristenelsen.app.api.services.SqlMethodProvider;
 import com.boristenelsen.app.database.services.DumpReader;
 import net.sf.jsqlparser.JSQLParserException;
+import org.apache.arrow.gandiva.exceptions.GandivaException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,11 +43,12 @@ public class StatementController {
         return new ResponseEntity<String>("Datenbank wurde erfolgreich initialisiert",HttpStatus.CREATED);
     }
     @PostMapping("/statement")
-    public ResponseEntity<IndexResponse> sendStatement(@RequestBody Statement statement) throws JSQLParserException {
+    public ResponseEntity<IndexResponse> sendStatement( @RequestBody Statement statement) throws JSQLParserException, GandivaException {
 
+        System.out.println(statement.getStatement());
         //Prüfe ob überhaupt ein Table-Objekt initiliasiert wurde ansonsten return Error
         //parse Statement through SqlMethodPicker
         IndexResponse  indexResponse = sqlMethodProvider.checkStatementToMethod(statement,dumpReader.getTable());
-        return new ResponseEntity<IndexResponse>(indexResponse, HttpStatus.OK);
+        return new ResponseEntity<>(indexResponse, HttpStatus.OK);
     }
 }

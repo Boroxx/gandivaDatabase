@@ -26,7 +26,7 @@ public class AppApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 
-		Table table = new Table();
+		/*
 		String statement = "SELECT aa,bb FROM table";
 
 		Statement stmt =  CCJSqlParserUtil.parse(statement);
@@ -42,9 +42,14 @@ public class AppApplication implements CommandLineRunner {
 			}
 
 		}
+		*/
+
+		/*
 		File file = ResourceUtils.getFile("classpath:dump.sql");
 		System.out.println(file.getAbsolutePath());
 		DumpReader dumpReader = new DumpReader(file);
 		dumpReader.initDatabase();
+
+		 */
 	}
 }

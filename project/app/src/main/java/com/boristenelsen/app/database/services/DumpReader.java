@@ -15,6 +15,7 @@ import net.sf.jsqlparser.statement.create.table.ColumnDefinition;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.insert.Insert;
 import org.apache.arrow.vector.FieldVector;
+import org.apache.arrow.vector.IntVector;
 import org.apache.arrow.vector.UInt4Vector;
 import org.apache.arrow.vector.VarCharVector;
 import org.apache.arrow.vector.types.pojo.ArrowType;
@@ -104,7 +105,7 @@ public class DumpReader {
             case "varchar":
                 return new Field(colName, FieldType.nullable(new ArrowType.Utf8()), null);
             case "mediumint":
-                return new Field(colName, FieldType.nullable(new ArrowType.Int(32, false)), null);
+                return new Field(colName, FieldType.nullable(new ArrowType.Int(32, true)), null);
 
         }
         throw new Exception();
@@ -126,15 +127,15 @@ public class DumpReader {
                 List <Column> columns = insert.getColumns();
 
                 //Pro Eintrag muss sich der Index automatisch erhöhen
-                ((UInt4Vector) table.vectorSchemaRoot.getVector("`id`")).setSafe(table.getCounter(),table.getCounter());
+                ((IntVector) table.vectorSchemaRoot.getVector("`id`")).setSafe(table.getCounter(),table.getCounter());
                 //Iteriere über jeden einzelnen Wert in der Expression und fülle diesen Wert in die richtige Spalte. Anders gesagt fülle Apache Arrow Table mit Daten aus SQLDump
                 for(int i=0; i <  columns.size();i++){
                     Column col = columns.get(i);
                     String colName = col.getColumnName();
                     FieldVector field = table.vectorSchemaRoot.getVector(colName);
 
-                    if(field instanceof UInt4Vector){
-                        ((UInt4Vector) table.vectorSchemaRoot.getVector(colName)).setSafe(table.getCounter(),Integer.parseInt(exp.get(i).toString()));
+                    if(field instanceof IntVector){
+                        ((IntVector) table.vectorSchemaRoot.getVector(colName)).setSafe(table.getCounter(),Integer.parseInt(exp.get(i).toString()));
                         MemoryUtil.printLongAsAdress(table.vectorSchemaRoot.getVector(colName).getDataBufferAddress());
                     }else if(field instanceof VarCharVector){
                         ((VarCharVector) table.vectorSchemaRoot.getVector(colName)).setSafe(table.getCounter(),exp.get(i).toString().getBytes());
