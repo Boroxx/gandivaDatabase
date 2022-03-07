@@ -34,7 +34,6 @@ import java.util.regex.Pattern;
 public class DumpReader {
 
     private File dumpFile;
-    private Schema dumpSchema;
     private Table table;
 
     public DumpReader(File dumpFile){

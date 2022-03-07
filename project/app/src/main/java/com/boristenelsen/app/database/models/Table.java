@@ -55,6 +55,15 @@ public class Table {
         return null;
     }
 
+    public String getTypeByName(String colName){
+        for(Field field : this.fieldList){
+            if(field.getName().equals(colName)){
+                return field.getType().toString();
+            }
+        }
+        return null;
+    }
+
     public int getRowSize(){
         return counter;
     }
