@@ -108,7 +108,8 @@ CREATE TABLE `myTable` (
   PRIMARY KEY (`id`)
 ) AUTO_INCREMENT=1;
   \end{textcode}
-\end{terminalblock}\\
+\end{terminalblock}
+
 dann erkennt der DumpReader-Service das Create-Statement und legt ein neues Table-Objekt. Dieses muss jedoch ein spezifisches Schema erhalten,sowie die verschiedenen Spaltenfelder und deren Typ.
 Diese Information erhält der Service aus dem SQL-Dump.
 Das Statement wird mithilfe von JSQL geparsed.
@@ -134,7 +135,7 @@ VALUES
   ("Bevis Davenport",0),
   ("Ronan Tucker",9);
   \end{textcode}
-\end{terminalblock}\\
+\end{terminalblock}
 
 Der DumpReader-Service erkennt nun das Insert-Statement und springt in die \textbf{prepareDataForMemory(String stmt,Table table)} Methode. Hier wird wieder mithilfe von JSQL das INSERT-Statement geparsed und in Datenstücke aufgespalten.
 Da bei der Initialisierung der Datenbank ein Table-Objekt mit einem VectorSchemaRoot-Objekt und einem Schema erstellt wird,können hier die Daten aus dem Insert-Statement in die dazugehörigen Vektoren geschrieben werden.
