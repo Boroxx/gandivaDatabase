@@ -106,7 +106,9 @@ public class SqlMethodProvider {
         List<String> types = new ArrayList<>();
         List<Integer> offets = Arrays.stream(indices).boxed().collect(Collectors.toList());
         types.add(table.getTypeByName(columnName));
-        return new IndexResponse(memoryAdressList,offets,types);
+        int length = indices.length;
+
+        return new IndexResponse(memoryAdressList,offets,types,length);
 
     }
 
@@ -126,7 +128,9 @@ public class SqlMethodProvider {
         List<String> types = new ArrayList<>();
         List<Integer> offets = Arrays.stream(indices).boxed().collect(Collectors.toList());
         types.add(table.getTypeByName(columnName));
-        return new IndexResponse(memoryAdressList,offets,types);
+        int length = indices.length;
+
+        return new IndexResponse(memoryAdressList,offets,types,length);
 
     }
 
@@ -158,7 +162,8 @@ public class SqlMethodProvider {
         List<String> types = new ArrayList<>();
         List<Integer> offets = Arrays.stream(indices).boxed().collect(Collectors.toList());
         types.add(table.getTypeByName(columnName));
-        return new IndexResponse(memoryAdressList,offets,types);
+        int length = indices.length;
+        return new IndexResponse(memoryAdressList,offets,types,length);
 
 
     }
@@ -180,7 +185,9 @@ public class SqlMethodProvider {
             memoryAdressList.add(Long.toHexString(fieldVector.getDataBufferAddress()));
             types.add(fieldVector.getField().getType().toString());
         }
-        return new IndexResponse(memoryAdressList,offets,types);
+        int length = table.getCounter();
+
+        return new IndexResponse(memoryAdressList,offets,types,length);
     }
 
     /**
@@ -203,7 +210,9 @@ public class SqlMethodProvider {
                 }
             }
         }
-        return new IndexResponse(memoryAdressList,offets,types);
+        int length = table.getCounter();
+
+        return new IndexResponse(memoryAdressList,offets,types,length);
     }
 
 

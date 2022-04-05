@@ -13,5 +13,6 @@ public class IndexResponse {
     public List<String> memoryAdress;
     public List<Integer> offsets;
     public List<String> types;
+    public int entries;
 
 }
