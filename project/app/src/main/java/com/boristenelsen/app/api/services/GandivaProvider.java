@@ -101,7 +101,7 @@ public class GandivaProvider implements IGandivaProvider {
 
     public SelectionVectorInt32 createSelectionVector(Table table){
         int numRows = table.getRowSize();
-        ArrowBuf selectionBuffer = table.allocator.buffer(numRows*3);
+        ArrowBuf selectionBuffer = table.allocator.buffer(numRows*table.getCounter());
         return new SelectionVectorInt32(selectionBuffer);
     }
 

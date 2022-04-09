@@ -4,6 +4,7 @@ import com.boristenelsen.app.api.model.IndexResponse;
 import com.boristenelsen.app.api.model.Statement;
 import com.boristenelsen.app.database.models.Table;
 import com.boristenelsen.app.database.utils.MemoryUtil;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
@@ -18,18 +19,11 @@ import net.sf.jsqlparser.statement.select.*;
 import org.apache.arrow.gandiva.evaluator.Filter;
 import org.apache.arrow.gandiva.evaluator.SelectionVectorInt32;
 import org.apache.arrow.gandiva.exceptions.GandivaException;
-import org.apache.arrow.gandiva.expression.Condition;
-import org.apache.arrow.gandiva.expression.TreeBuilder;
-import org.apache.arrow.gandiva.expression.TreeNode;
-import org.apache.arrow.memory.ArrowBuf;
 import org.apache.arrow.vector.FieldVector;
-import org.apache.arrow.vector.ipc.message.ArrowFieldNode;
 import org.apache.arrow.vector.ipc.message.ArrowRecordBatch;
-import org.apache.arrow.vector.types.pojo.ArrowType;
-import org.apache.arrow.vector.types.pojo.Field;
-import org.apache.arrow.vector.types.pojo.Schema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,6 +86,7 @@ public class SqlMethodProvider {
     }
 
     private IndexResponse selectWhereEqualsTo(String columnName, int value, Table table) throws GandivaException {
+
         Filter filter = gandivaProvider.equalsTo_NumberFilter(table,columnName,value);
         ArrowRecordBatch batch = gandivaProvider.createBatch(table,columnName);
         SelectionVectorInt32 selectionVectorInt32 = gandivaProvider.createSelectionVector(table);

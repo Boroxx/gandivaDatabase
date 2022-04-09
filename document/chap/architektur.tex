@@ -1,15 +1,5 @@
 \chapter{Architektur}
-
-
-\section{Arrow Datenbankkonzept}
-
-Um die Architektur der Datenbankanwendung verstehen zu können, muss auf das Konzept der Verarbeitung von Daten in dem Apache Arrow Framework eingegangen werden. Hierzu werden im folgenden einige Beispiele veranschaulicht dargestellt.
-
-Um Daten in mithilfe von Arrow in einer Art Container halten zu können werden sogennante 
-
-
-
-\section{Gandiva Filtermechanismus}
+\label{Architektur}
 
 \section{Design/Architektur}
 Um eine Schnittstelle zwischen der Datenbankanwendung und dem Nutzer zu schaffen, existieren zwei verschiedene Anwendungen. Die Clientanwendung und die Datenbankanwendung basierend auf einer Rest-Api stellen unterschiedliche Komponenten in dieser Arbeit dar.
@@ -57,6 +47,21 @@ Die Anfragen werden dann mithilfe des Frameworks Arrow in Layer Zwei weiterverar
 
 Im dritten Layer in \ref{graf_1} findet man das Framework Gandiva vor. 
 Gandiva wird zum Filtern und zum Projizieren von den im Arrow-Format abgelegten Daten benutzt. Für den Fall das eine SQL-Query nicht mithilfe von Gandiva ausgewertet werden kann, kann hier eine Handmade-Implementierung genutzt werden.
+
+\subsection{Einschränkungen der Datenbankanwendung}
+
+Die Datenbankanwendung muss in der Lage sein SQL-Statements entgegen nehmen zu können. Da ein zu großer Aufwand besteht jede Art eines SQL-Statements abzudecken, wird in dieser Thesis der Umfang eingeschränkt. Jedoch wird im Abschnitt \ref{Erweiterungen} beschrieben wie man relativ einfach verschiedene Funktionen erweitern kann, da ein modulares Prinzip in der Entwicklung der Anwendung verwendet wird.
+
+\subsubsection{Features der SQL-Statements}
+
+\begin{itemize}
+\item Der Table wird momentan im Statement nicht beachtet, da nur ein Table unterstützt wird 
+ \item Es kann mithilfe eines Select-Statements auf einzelne, mehrere oder alle Spalten zugegriffen werden
+ \item Falls ein Where-Statement benutzt wird, kann dieses nur auf eine einzelne Spalte angewendet werden
+ \item Where-Statements werden momentan nur mit den Operatoren kleiner,größer und gleich unterstützt
+ \item Es werden nur Abfragen unterstützt, welche Daten anfordern. Die Datenbank kann nicht mithilfe von Inserts bzw. Updates manipuliert werden.
+\end{itemize}
+
 
 
 

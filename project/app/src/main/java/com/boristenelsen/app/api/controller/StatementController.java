@@ -4,6 +4,7 @@ import com.boristenelsen.app.api.model.IndexResponse;
 import com.boristenelsen.app.api.model.Statement;
 import com.boristenelsen.app.api.services.SqlMethodProvider;
 import com.boristenelsen.app.database.services.DumpReader;
+import com.google.common.base.Stopwatch;
 import net.sf.jsqlparser.JSQLParserException;
 import org.apache.arrow.gandiva.exceptions.GandivaException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +31,12 @@ public class StatementController {
     @GetMapping("/initDatabase")
     public ResponseEntity<String> initDatabase() throws FileNotFoundException {
         //Initialisiere Datenbank mit Dump. Dump liegt vorerst an vorbestimmter Stelle. Hier macht es keinen Sinn einen Dump über Rest zu senden, da in der Praxis der Dump zu groß ist.
-        File file = ResourceUtils.getFile("classpath:dump.sql");
+        File file = ResourceUtils.getFile("classpath:dump10000.sql");
         dumpReader = new DumpReader(file);
         try {
+            Stopwatch stopwatch = Stopwatch.createStarted();
             dumpReader.initDatabase();
+            System.out.println("Init-Time: " + stopwatch.stop());
         } catch (IOException e) {
             return new ResponseEntity<String>("Fehler beim lesen des Files",HttpStatus.BAD_REQUEST);
         } catch (JSQLParserException e) {
@@ -48,7 +51,9 @@ public class StatementController {
         System.out.println(statement.getStatement());
         //Prüfe ob überhaupt ein Table-Objekt initiliasiert wurde ansonsten return Error
         //parse Statement through SqlMethodPicker
+        Stopwatch stopwatch = Stopwatch.createStarted();
         IndexResponse  indexResponse = sqlMethodProvider.checkStatementToMethod(statement,dumpReader.getTable());
+        System.out.println("Time: " + stopwatch.stop());
         return new ResponseEntity<>(indexResponse, HttpStatus.OK);
     }
 }

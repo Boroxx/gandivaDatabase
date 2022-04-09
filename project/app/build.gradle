@@ -33,7 +33,7 @@ dependencies {
 
 	implementation fileTree(dir: 'libs', include: '*.jar')
 	implementation group: 'com.google.guava', name: 'guava', version: '31.0.1-jre'
-
+	implementation("com.google.guava:guava:31.1-jre")
 	runtimeOnly group: 'org.apache.arrow', name: 'arrow-memory-netty', version: '3.0.0'
 	implementation group: 'org.apache.arrow', name: 'arrow-memory-unsafe', version: '3.0.0'
 }

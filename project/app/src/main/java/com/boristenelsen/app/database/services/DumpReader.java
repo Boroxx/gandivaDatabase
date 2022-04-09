@@ -47,6 +47,8 @@ public class DumpReader {
         scanner.useDelimiter(";");
 
         while(scanner.hasNext()){
+
+
             String statement = scanner.next();
             if(statement.equals("\n"))break;
 
@@ -56,8 +58,10 @@ public class DumpReader {
             }
             //Fülle für jeden Insert SQL-Dump
             if(isInsertStmt(statement)){
+
                 try {
                     prepareDataForMemory(statement,table);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

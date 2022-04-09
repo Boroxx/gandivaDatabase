@@ -1,11 +1,14 @@
 \chapter{Implementierung}
-
+\label{Implementierung}
 
 \section{Datenbankanwendung}
 
 Um die Implementierung möglichst Strukturiert zu beschreiben wird hier wieder die Datenbankanwendung und der Client getrennt betrachtet.
 Im folgenden Teil wird auf die Umsetzung der Architektur/Designs eingegangen, sowie auf das Zusammenspiel der Komponenten,der Layer und Funktionen.
 Da Gradle als build-Tool für die Anwendung benutzt wird lassen sich alle Technologien in der Anwendung im build.gradle File wieder finden. 
+Zum besseren Verständnis der Zusammenarbeit von den einzelnen Modellen und Services,ist es von Vorteil sich die Abbildung \ref{graf_3} anzuschauen.
+Hier kommuniziert der Client über ein Statement mit dem StatementController welcher in Form einer Spring Boot Anwendung in einem Tomcat-Webserver liegt.
+In dieser Spring Boot Anwendung liegen ebenfalls die verschiedenen Services der Datenbankanwendung, welche für die Kommunikation und Weiterverarbeitung der Daten notwendig sind. In der \ref{graf_3} sieht man, dass über die REST-API Logik die Datenbankanwendung mit ihren Services angesprochen werden kann.
 
 \begin{figure}[h]
   \centering
@@ -63,6 +66,7 @@ Wenn ein SQL-Dump über die Route initialisiert wird, erstellt der DumpReader-Se
 
 
 \subsection{DumpReader-Service}
+\label{DumpReader}
 Der DumpReader-Service ist für das lesen des SQL-Dumps zuständig. Er iteriert über jedes Statement in der Dump Datei,überprüft dieses und reagiert je noch Typ des Statements anders.
 Findet man beispielsweise folgendes Statement im Kopf des SQL-Dumps,
 \\
@@ -147,7 +151,7 @@ Der DumpReader kümmert sich letztendlich um die Initialisierung eines SQL-Dumps
 Anfragen über die Datenbank laufen vom StatementController aus in den SqlMethodProvider-Service. Dieser ist dafür zuständig das SQL-Statement und somit die Datenanfrage auszuwerten.
 
 Alle Anfragen in Form von Statements werden von einer Verteiler-Methode aus an weitere Methoden verteilt und vom Statement abhängig ausgewertet.
-Die Verteiler-Methode \textbf{checkStatementToMethod(String statement, Table table)} bekommt das Statement als String, sowie das Table-Objekt aus dem DumpReader-Service übergeben. In der Arbeit wird nur mit einem Table gearbeitet, somit findet hier keine Logik für die Auswahl eines Tables statt. Jedoch lässt sich dieses Feature einfach erweitern. Weiteres dazu in Abschnitt Erweiterungen.\\
+Die Verteiler-Methode \texttt{checkStatementToMethod(String statement, Table table)} bekommt das Statement als String, sowie das Table-Objekt aus dem DumpReader-Service übergeben. In der Arbeit wird nur mit einem Table gearbeitet, somit findet hier keine Logik für die Auswahl eines Tables statt. Jedoch lässt sich dieses Feature einfach erweitern. Weiteres dazu in Abschnitt Erweiterungen.\\
 
 In der Verteiler-Methode wird das Statement mit JSQL in verschiedensten Ausführungen geparsed. Diese Ausführungen sind von dem gewollten Datenanfrage-Umfang abhängig.Der folgende Unterabschnitt geht weiter auf die einzelnen Handmade-Methoden ein, die mit den Kern der Anwendung ausmachen.
 
@@ -189,7 +193,7 @@ Dieser Bereich der Verteiler-Methode würde bei folgendem übergebenen Statement
 \end{center}
 
 Hier wird wie oben erwähnt an die dazugehörige Handmade-Methode selectEverything(table) verteilt. Diese Art von Implementierung ermöglicht es Modular weitere Fälle abzudecken.
-In der Methode selectEverything(Table table) werden alle nötigen Felder für die IndexResponse befüllt. Hierzu wird über das Table-Objekt die FieldVector-Liste ermittelt, welche alle Daten enthält. Dann werden die verschiedenen Data-Buffer-Adressen der einzelnen Vektoren ermittelt und in eine Liste geschrieben. Ebenfalls wird eine Liste mit den dazugehörigen Vektor-Typen erstellt.Für ein besseres Verständnis hilft es sich hier nocheinmal das IndexResponse-Objekt in Abschnitt \ref{Modelle} anzuschauen.\\
+In der Methode selectEverything(Table table) werden alle nötigen Felder für die IndexResponse befüllt. Hierzu wird über das Table-Objekt die FieldVector-Liste ermittelt, welche alle Daten enthält. Dann werden die verschiedenen Data-Buffer-Adressen der einzelnen Vektoren ermittelt und in eine Liste geschrieben. Ebenfalls wird eine Liste mit den dazugehörigen Vektor-Typen erstellt.Für ein besseres Verständnis hilft es sich hier noch einmal das IndexResponse-Objekt in Abschnitt \ref{Modelle} anzuschauen.\\
 Da in dieser Art von Anfrage alle Einträge benötigt werden, existieren hier keine Offsets, da von der virtuellen Memory-Adresse aus mithilfe des Datentyps inkrementiert werden kann.Dafür wird die Anzahl der Einträge, welche die Anfrage widerspiegelt mit übergeben.In diesem Fall bleibt die Offset-Liste also leer.
 Somit wird ein valide IndexResponse generiert und es kann vom Client auf die angefragten Daten per RDMA zugegriffen werden.Die an den Client übermittelte IndexResponse wird über den Controller in Form von JSON zurückgeliefert. Dies kann man sehr gut in der Grafik \ref{graf_4} erkennen.
 
@@ -215,6 +219,7 @@ In der IndexResponse werden dann nur die virtuellen Memory-Adressen zurückgelie
 In diesem Fall würde es in der Grafik \ref{graf_4} unter dem Feld memoryAdress nur zwei Einträge geben.
 
 \subsection{GandivaProvider-Service}
+\label{GandivaProvider-Service}
 
 Wie in \ref{SqlMethodProvider-Service} bereits erklärt, gibt es im Sql-MethodProvider-Service nicht nur Handmade-Methoden sondern auch Methoden die mit dem GandivaProvider-Service zusammenhängen.
 \\
@@ -245,32 +250,123 @@ Sobald die Verteiler-Methode erkennt, dass Gandiva für das Statement benötigt 
 Diese Methode selectWhereEqualsTo wird beispielsweise durch das Statement
 
 \begin{center}
+\label{Where-Statement}
 \code{SELECT spalte FROM table WHERE spalte = 5}
 \end{center}
 
 ausgeführt. Hier wird die Spalte spalte in der Datenbank nach dem Wert 5 gefiltert. Dieser Filterprozess wird eingeleitet durch den GandivaProvider.
 Für jeder Art von Filter muss in dem GandivaProvider eine eigene Methode hinzugefügt werden. In dem GandivaProvider findet sich zum Beispiel die \textbf{equalsTo\_NumberFilter}-Methode, welche den passenden Filter generiert.
 Mithilfe dieses Filters wird dann in Zeile 9 der Datensatz evaluiert. Um diesen Datensatz jedoch evaluieren zu können benötigt die Methode \textbf{evaluate} noch einen ArrowRecordBatch und einen SelectionVectorInt32.
-Der ArrowRecordBatch und der SelectionVectorInt32 werden beide durch den GandivaProvider erstellt mithilfe der Methode \textbf{createBatch} und \textbf{createSelectionVector}.
+Der ArrowRecordBatch und der SelectionVectorInt32 werden beide durch den GandivaProvider,mithilfe der Methode \textbf{createBatch} und \textbf{createSelectionVector}, erstellt.
 
-\subsubsection{GandivaProvider: equalsTo\_NumberFilter}
 
 \subsubsection{ArrowRecordBatch}
 
-Der ArrowRecordBatch bekommt die Anzahl der Vektoren des Tables mit übergeben.
-Es werden zwei ArrowBuffer erstellt. In dem Spalten-Buffer werden die nötigen Daten des Vektors bzw der Spalte abgelegt und in dem Validity-Buffer wird festgelegt welche Einträge der Spalten valide Einträge sind. Das heißt hier könnte man wenn man möchte Spalteneinträge aus der Datenbankanfrage ausschließen.
-Diese beiden ArrowBuffer werden in einer Liste verpackt und in dem Konstruktor des ArrowRecordBatch übergeben. Zusätzlich wird noch eine Liste übergeben mit ArrowFieldNodes, welche die ganze Spalten ausschließen kann. In dem oben genannten Beispiel wird diese Funktion nicht benötigt.
+Der \texttt{ArrowRecordBatch} bekommt die Anzahl der Vektoren des Tables mit übergeben.
+Es werden zwei \texttt{ArrowBuffer} erstellt. In dem Spalten-Buffer werden die nötigen Daten des Vektors bzw der Spalte abgelegt und in dem Validity-Buffer wird festgelegt welche Einträge der Spalten valide Einträge sind. Das heißt hier könnte man wenn man möchte Spalteneinträge aus der Datenbankanfrage ausschließen.
+Diese beiden \texttt{ArrowBuffer} werden in einer Liste verpackt und in dem Konstruktor des \texttt{ArrowRecordBatch} übergeben. Zusätzlich wird noch eine Liste übergeben mit \texttt{ArrowFieldNodes}, welche die ganze Spalten ausschließen kann.
 
-\subsubsection*{SelectionVector32}
+\subsubsection{SelectionVector32}
 
 Der SelectionVector stellt eine Repräsentation eines ArrowBuffers dar, welcher groß genug ist um die ausgewerteten Daten der Evaluation festzuhalten.
 
 
+\subsubsection{GandivaProvider-Interface}
+Grundsätzlich wird das gleiche Prinzip für alle Filter-Methoden in der Anwendung benutzt. Ein Filter in solch einer Methode wird wie im Beispiel in Abschnitt \ref{Beispiel eines Filters} erstellt. Das GandivaProvider-Interface,welches im GandivaProvider implementiert wird,dient mehr als eine Art Nachschlagewerk und Übersicht für alle verschiedenen Filter-Funktionen, welche im SqlMethodProvider aufgerufen werden,als ein wirkliches Interface.
+Alle Methoden liefern einen Filter über verschiedene TreeNodes in Form von Funktionen, Feldern und Literalen,aus. Durch dieses Vorgehen ist gesichert, dass die Datenbankanwendung beliebig erweitert werden kann.
+Eine Übersicht von den Filter-Funktionen findet man in der Tabelle \ref{GandivaProvider Filter-Funktionalität} und das dazugehörige SQL-Beispiel in \ref{GandivaProvider SQL-Statement zu Filter}
 
-- Wie erweitere ich die Anwendung
-- Wie schnell liefert mir eine Anfrage den Zugriff
-- Was kann ich zu den Daten sagen
-- Wie funktioniert Gandiva
-- CheckStatementToMethod auf Table-Spezifisch erweitern
+\begin{table}[H]
+\begin{center}
+    \begin{tabular}{| l | l | l |}
+    \hline
+     Nr & Methode & Funktion \\ \hline
+    1 & lessThanNumberFilter & Filtert Daten < Wert  \\ \hline
+    2 & greaterThanNumberFilter & Filtert Daten > Wert \\ \hline
+    3 & equalsThanNumberFilter & Filtert Daten == Wert  \\ \hline
+    \end{tabular}
+\end{center}
+\caption{GandivaProvider Filter-Funktionalität}
+\label{GandivaProvider Filter-Funktionalität}
+\end{table}
+
+\begin{table}[H]
+\begin{center}
+    \begin{tabular}{| l | l |}
+    \hline
+     Nr & SQL-Statement \\ \hline
+    1 & SELECT col FROM table WHERE col < WERT  \\ \hline
+    2 & SELECT col FROM table WHERE col > WERT  \\ \hline
+    3 & SELECT col FROM table WHERE col = WERT   \\ \hline
+    \end{tabular}
+\end{center}
+\caption{GandivaProvider SQL-Statement zu Filter}
+\label{GandivaProvider SQL-Statement zu Filter}
+\end{table}
+
+\subsection{Zusammenspiel der Komponenten}
+Das Zusammenspiel der Komponenten wird sehr übersichtlich in der Grafik \ref{graf_3} deutlich. Vom Client aus können über eine REST-API verschiedene Statements gesendet,sowie die Datenbank initialisiert werden.
+Das gesendete Statement wird vom \texttt{SqlMethodProvider} interpretiert und dann an verschiedene Service-Methoden weitergeleitet, um eine valide \texttt{IndexResponse} zu generieren. Diese \texttt{IndexResponse} spiegelt dann die Antwort der Datenbank an den Client wider. Je nach Art der Anfrage wird eine Handmade-Methode oder eine Gandiva-Methode ausgewertet, welche den Prozess der Filterung der Daten widerspiegelt.
 
 
+\subsection{How to}
+
+
+
+\section{Erweiterungen und Features}
+\label{erweitern}
+
+Die folgenden Abschnitte zeigen Beispielfälle zur funktionellen Erweiterung der Datenbankanwendung auf. Er ist an Zielpersonen gerichtet, welche ein Interesse daran haben, beispielsweise weitere Anfrage-Statements von der Datenbankanwendung unterstützen zu lassen. Es wird aufgezeigt, wie in wenigen Schritten, ein ganzes Statement mithilfe der verschiedenen Services interpretiert und ausgewertet werden können.\\
+Die Initialisierung der Datenbank erfolgt über den \texttt{DumpReader}, welcher den vorliegenden SQL-Dump einließt und in ein \texttt{Table}-Objekt einließt,welches als Table in der Datenbank agiert.
+Da die Datenbankanwendung auf einer Spring-Boot-Anwendung basiert, welche einen Webserver laufen lässt,wird die Datenbank dann terminiert falls der Webserver terminiert wird. 
+
+\subsection{Datentyp hinzufügen}
+Im Abschnitt \ref{DumpReader} wurden die verschiedenen Datentypen beschrieben, die die Anwendung momentan unterstützt. Diese sind ebenfalls relativ einfach zu erweitern.\\
+Der vorliegende Code zeigt einen Auszug aus dem \texttt{DumpReader} und beschreibt die \texttt{prepareField(String colName,String colDataType)}-Methode.
+
+\begin{codeblock}{DumpReader.java}{Java}
+  \begin{javacode}
+public Field prepareField(String colName, String colDataType) throws Exception {
+        String[] colType = colDataType.split(" ");
+        switch (colType[0]) {
+            case "char":
+                return new Field(colName, FieldType.nullable(new ArrowType.Utf8()), null);
+            case "varchar":
+                return new Field(colName, FieldType.nullable(new ArrowType.Utf8()), null);
+            case "mediumint":
+                return new Field(colName, FieldType.nullable(new ArrowType.Int(32, true)), null);
+
+        }
+        throw new Exception();
+    }
+  \end{javacode}
+\end{codeblock}
+
+Es wird der, aus dem SQL-Dump-Schema, übergebene Datentyp überprüft und ein \texttt{Field}-Objekt generiert, um dem Arrow-Speicherformat, ein valides Schema zu übergeben.
+Hier kann ein weiterer case-Fall hinzugefügt werden, welcher den zugehörigen SQL-Datentypen auf den richtigen Arrow-Datentypen mapped.
+
+\subsection{Gandiva-Methoden erweitern}
+
+Da bisher nicht alle SQL-Statements von der Datenbankanwendung unterstützt werden, wird hier eine Möglichkeit aufgezeigt, wie man den Sourcecode um einige Operationen erweitern kann.\\
+Angenommen es soll folgendes SQL-Statement von der Datenbankanwendung erkannt und ausgewertet werden.
+
+\begin{center}
+\code{SELECT col FROM table WHERE col <= WERT;}
+\end{center}
+
+Vorerst muss abgeklärt werden,ob die Funktion \glqq{}kleiner-gleich\grqq{} schon in dem Gandiva-Framework vorhanden ist. Dazu muss in der Datei \texttt{function\_registry\_arithmetic.cc} im Github-Repository  nach dem Namen der Funktion gesucht werden.\\\\
+
+In diesem Fall ist der Name für diese Funktion \textbf{less\_than\_or\_equal\_to}.\\
+Nun muss in der \texttt{checkStatementToMethod}-Methode, mithilfe von JSQL, das Statement richtig abgefangen und von der Verteiler-Methode ,an eine GandivaProvider-Methode,mit dem nötigen Spaltennamen und Wert,weitergeleitet werden.\\\\
+
+Damit auf den richtigen Klassentypen der Expression überprüft wird,sollte man hier in dem \texttt{package net.sf.jsqlparser.expression.operators.relational} nach dem richtigen Operator suchen.\\
+In diesem Fall heißt die passende Klasse \texttt{GreaterThanEquals}. Der Else-If Block kann nun mit den Änderungen der \texttt{GreaterThanEquals}-Klasse erweitert werden. Ebenso muss eine private Methode erstellt werden, welche wie bei bsp. \texttt{selectWhereEqualsTo} eine \texttt{IndexResponse} zurückliefert.
+Um eine valide \texttt{IndexResponse} zu erstellen, muss eine Filter-Methode in dem \texttt{GandivaProvider} eingebaut werden.
+Hier kann sich an den anderen Methoden des Providers orientiert werden. Wichtig ist jedoch die richtige Funktion ,die sich in der \texttt{function\_registry\_arithmetic.cc} befindet,mithilfe der \texttt{TreeBuilder.makeFunction()} aufzurufen.
+
+\subsection{Ideen zur Erweiterung der Anwendung}
+
+Die Datenbankanwendung unterstützt momentan nur einen Table. Das bedeutet es kann nur ein SQL-Dump pro Anwendung eingelesen werden.
+Es wäre jedoch möglich im \texttt{DumpReader} eine Liste von \texttt{Table}-Objekten einzulesen und diese wie gewohnt im Hauptspeicher abzulegen.\\
+Dafür müsste der \texttt{Table}-Klasse jedoch ein eindeutiger Identifier zugewiesen werden, damit vom Client immer auf den richtigen Table zugegriffen wird.
+Momentan wird der Name des Tables auf den zugegriffen wird im SQL-Statement nicht beachtet.
