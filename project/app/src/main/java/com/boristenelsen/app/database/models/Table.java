@@ -68,5 +68,18 @@ public class Table {
         return counter;
     }
 
+    public String getInfo(){
+        String info = "------------------------------\r\n";
+        info+= "Der Initiliasierte Table besteht aus: " + fieldList.size() + " Spalten.\r\n";
+
+        for(Field field : fieldList){
+            info += "| " + field.getName() +" |";
+        }
+        info+="\r\n------------------------------\r\n";
+
+        return info;
+
+
+    }
 
 }

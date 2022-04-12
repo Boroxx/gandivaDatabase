@@ -1,11 +1,12 @@
 \chapter{Grundlagen}
+\label{Grundlagen}
 
 \section{Datenbankverwaltungssysteme}
 
 Einer der wichtigsten Aspekte einer Datenbankanwendung ist die Performance. 
 
-Mit der Zeit wird es auf der Welt immer wichtiger große Mengen an Daten mithilfe einer Datenbank persistieren und verarbeiten zu können.
-In Bezug auf den Speicher kann hier unterschieden werden zwischen einer In-Memory Datenbank,wie beispielsweise Redis oder H2 und einer On-Disk Datenbank,wie Postgresql,welche auf dem Sekundärspeicher operiert. \\
+Mit der Zeit wird es auf der Welt immer wichtiger große Mengen an Daten, mithilfe einer Datenbank, persistieren und verarbeiten zu können.
+In Bezug auf den Speicher kann hier unterschieden werden zwischen einer In-Memory Datenbank,wie beispielsweise Redis\cite{Redis} oder H2\cite{H2} und einer On-Disk Datenbank,wie Postgresql \cite{PostgreSQL},welche auf dem Sekundärspeicher operiert. \\
 
 In-Memory Datenbanken haben den Vorteil, dass diese eine geringe Latenz bei Anfragen und Operationen vorweisen, da die Daten sich schon im Hauptspeicher befinden. Bei einer On-Disk Datenbank muss der benötigte Speicher bei einer Anfrage erst in den Hauptspeicher aus dem Sekundärspeicher geladen werden. Diese Input/Output Operationen konsumieren eine Menge Zeit bei einer großen Menge von Daten.\cite{KABAKUS2017520}
 Aufgrund dieser Tatsache ist es für diese Thesis sinnvoll sich In-Memory Datenbankverwaltungssystem genauer anzuschauen. 
@@ -25,29 +26,32 @@ Mit diesem Artikel kam die Hardware Intel Optane Persistent Memory auf den Markt
 Im Gegensatz dazu befindet sich DRAM bei ca 128GB.
 Diese neuen Speichermodule sind DDR4 kompatibel und somit als Hauptspeicher nutzbar. \cite{IntelOptane:Micron}
 
-Gegenüber DRAM hat das Intel-Optane-Modul Nicht-flüchtigen Speicher. Das bedeutet,dass  Daten welche sich in einer Datenbankverwaltung befinden,bei Spannungsverlust nicht verloren gehen.
-Die Eigenschaften des IntelOptane Moduls sollen es ermöglichen eine Große Menge an Daten im Speicher abzulegen und trotz der Verwendung von Nicht-flüchtigem Speicher eine gute Performance sicherzustellen.
+Gegenüber DRAM hat das Intel-Optane-Modul Nicht-flüchtigen Speicher. Das bedeutet, dass  Daten, welche sich in einer Datenbankverwaltung befinden,bei Spannungsverlust nicht verloren gehen.
+Die Eigenschaften des Intel-Optane Moduls sollen es ermöglichen eine Große Menge an Daten im Speicher abzulegen und trotz der Verwendung von Nicht-flüchtigem Speicher eine gute Performance sicherzustellen.
  
 \subsection{Reihen-orientierter Speicher vs Spalten-orientierter Speicher}
 Bei der Performance spielt auch eine große Rolle,in welchem Format die Daten in den Speicher gelegt werden. Hier wird unterschieden zwischen dem Reihen-orientierten und dem Spalten-orientierten Speicherformat.
-Die meisten traditionellen Datenbankverwaltungssysteme benutzen ein Reihen-orientiertes Speicherformat, welches Datentupel aus den Reihen hintereinander im Speicher persistiert. Solch ein System ist laut \cite{Stonebraker2005CStoreAC} ein "Schreib-optimiertes System".
+Die meisten traditionellen Datenbankverwaltungssysteme benutzen ein Reihen-orientiertes Speicherformat, welches Datentupel aus den Reihen hintereinander im Speicher persistiert. Solch ein System ist laut \cite{Stonebraker2005CStoreAC} ein \glqq{}Schreib-optimiertes System\grqq{}.
 
-Grafik
+Bei einem Spalte-orientierten Datenbanksystem, werden keine Datentupel hintereinander im Speicher persistiert, sondern die Einträgen spaltenweise pro Eintrag,nacheinander, in den Speicher gelegt. In der Grafik \ref{graf_8}sieht man, dass jeder Eintrag einer Spalte, hintereinander im Speicher liegt. Auf diese Weise können auf größeren Datensätzen schnellere Funktionen auf einzelne Einträge ausgeführt werden, ohne dass Daten, die nicht benötigt werden, mitgeladen werden müssen.
 
-Bei einem Spalte-orientierten Datenbanksystem, werden keine Dateneinträge hintereinander im Speicher persistiert, sondern die Einträgen spaltenweise pro Eintrag nacheinander in den Speicher gelegt. In der Grafik sieht man, dass jede ID eines Eintrags hintereinander im Speicher liegt. Auf diese Weise können auf größeren Datensätzen schnellere Funktionen auf einzelne Einträge ausgeführt werden, ohne dass Daten, die nicht benötigt werden,mitgeladen werden müssen.
+\begin{figure}[h]
+  \centering
+  \begin{subfigure}[b]{0.5\textwidth}
+    \includegraphics[width=1.0\linewidth]{img/speicher}
+  \end{subfigure}
+  \caption{Reihen-Orientiert vs Spalten-Orientiert}
+  \label{graf_8}
+\end{figure}
 
-Im Gegensatz dazu gleicht der Ansatz eines Spalten-Orientierten Datenbankspeicher-Layouts diesen Performanceverlust aus. 
-Da die Daten eines Objektes hier Spaltenweise persistiert werden können Operationen auf langen Spalten sehr performant ausgeführt werden.
-
-Grafik
-
+Da die Daten eines Objektes hier Spaltenweise persistiert werden, können Operationen auf langen Spalten sehr performant ausgeführt werden.
 Aufgrund dieser Vorteile wird in dieser Arbeit ausschließlich eine In-Memory Datenbank mit einem Spalten-Orientierten Speicher behandelt.
 Zur Speicherung der Daten in einem Spalten-orientierten Format wird Apache Arrow verwendet.
 
 \section{Apache Arrow}
 
 Apache Arrow ist ein Framework, welches ein Sprachen-unabhängiges Spalten-orientiertes Speicherformat definiert. 
-Um Arrow nutzen zu können stellt Apache, in verschiedene Sprachen Bindings zu Verfügung. In dieser Arbeit wird die Programmiersprache Java benutzt, und daher ist die Dokumentation der Java-Api von Apache Arrow eine wichtige Informationsquelle.\cite{Apache:Arrow:JavaApi}
+Um Arrow nutzen zu können stellt Apache, in verschiedene Sprachen Bindings zu Verfügung. In dieser Arbeit wird die Programmiersprache Java benutzt, und daher ist die Dokumentation der Java-API von Apache Arrow eine wichtige Informationsquelle.\cite{Apache:Arrow:JavaApi}
 Arrow umgeht das Problem, dass jede Sprache eine unterschiedliche Serialisierung und Deserialisierung von Daten im Speicher und in der Übertragung von Daten über das Netzwerk,unterstützt.
 Das Framework vereinheitlicht die Serialisierung und Deserialisierung indem es sämtliche Objekte unter der Haube als Datenstrom interpretiert.
 Im folgenden Teil wird auf die verschiedenen Mechanismen und Prinzipien zur Speicherung von Daten mithilfe des Arrow-Frameworks eingegangen. Dazu werden verschiedene Klassen beschrieben und Beispiele erklärt.
@@ -57,13 +61,14 @@ Im folgenden Teil wird auf die verschiedenen Mechanismen und Prinzipien zur Spei
 Vektoren können in Arrow verschiedene Typen von Daten halten. Beispielsweise gibt es die Klasse \texttt{IntVector} oder \texttt{VarCharVector}.
 Der \texttt{IntVector} basiert auf der Klasse \texttt{BasedFixedWidthVector} und stellt einen Vektor dar, welcher eine feste Größe an Bytes besitzt. Jede Art von Vektor besitzt unter der Haube einen Werte-Buffer und einen Validierungs-Buffer in Form eines \texttt{ArrowBuf}-Objektes.\\
 Mithilfe dieser Buffer ist es möglich Daten zu allozieren und schneller auszuwerten. Warum schneller?
-Weil Arrow mithilfe des Validierungs-Buffers Dateneinträge im Vektor überwacht,welche null sein können und diese dann erst gar nicht mit auswertet.
+Weil Arrow mithilfe des Validierungs-Buffers, Dateneinträge im Vektor überwacht,welche ein null-Objekt repräsentieren könnten. Diese würden aufgrund des Buffers bei einer Evaluierung gar nicht erst mit ausgewertet werden.
 
 Ein Beispiel kann aus der Dokumentation \cite{Apache:Arrow:ValueVector} entnommen werden.
 
+\label{VectorValue}
 \begin{codeblock}{ValueVectorBeispiel.java}{Java}
   \begin{javacode}
-  \label{VectorValue}
+
 RootAllocator allocator = new RootAllocator(Long.MAX_VALUE);
 ...
 IntVector vector = new IntVector("int vector", allocator);
@@ -75,8 +80,8 @@ vector.close();
   \end{javacode}
 \end{codeblock}
 
-In dem Code-Beispiel \ref{VectorValue} sieht man, die Allozierung eines Integer-Vektors. Einem Vektor wird im Konstruktor ein Name übergeben und ein Allocator, welcher sicherstellt,dass die Daten im Hauptspeicher landen.
-Mit der der Methode \texttt{set(int index,int value)} kann an eine Stelle im Vektor ein Wert eingetragen werden.
+In dem Code-Beispiel \ref{VectorValue} sieht man die Allokation eines Integer-Vektors. Einem Vektor wird im Konstruktor ein Name übergeben und ein \texttt{Allocator}, welcher sicherstellt, dass die Daten im Hauptspeicher zur Verfügung stehen.
+Mit der Methode \texttt{set(int index,int value)} kann an eine Stelle im Vektor ein Wert eingetragen gespeichert werden.
 Dieser kann mit der Methode \texttt{get(int index)} wieder aufgerufen werden.
 
 
@@ -87,11 +92,10 @@ Meist reicht es aus nur eine \texttt{VectorSchemaRoot}-Instanz zu initialisieren
 In dieser Arbeit ist dem \texttt{VectorSchemaRoot}-Objekt viel Aufmerksamkeit zu schenken, da es zur Speicherung der Datenbankeinträge verwendet wird.
 
 \texttt{VectorSchemaRoot} besitzt eine statische Methode \texttt{create(Schema schema, Allocator allocator)} mit der eine Instanziierung möglich ist.
-Nachdem das Objekt instanziiert wurde, kann mithilfe der Methode \texttt{getVector(String vektorName)} auf den leeren Vektor, wie in \ref{VectorSchemaBeispiel},zugegriffen werden.
+Nachdem das Objekt instanziiert wurde, kann mithilfe der Methode \texttt{getVector(String vektorName)} auf den leeren Vektor, wie in \texttt{VectorSchemaRootBeispiel.java}, zugegriffen werden.
 
-\begin{codeblock}{VectoSchemaRootBeispiel.java}{Java}
+\begin{codeblock}{VectorSchemaRootBeispiel.java}{Java}
   \begin{javacode}
-  \label{VectorSchemaBeispiel}
 ...
 IntVector intVector = vectorSchemaRoot.getVector(vektorName);
 intVector.set(1,200);
@@ -104,17 +108,13 @@ Hier hält das \texttt{VectorSchemaRoot}-Objekt, nun einen \texttt{IntVector} mi
 Dieses Vorgehen ist nicht nur mit Integer-Vektoren möglich, sondern mit allen beliebigen Arten von Datentypen.
 
 
-\section{Serialisierung und Deserialisierung}
-
-Was ist das?
-
 \section{Gandiva}
 Das Open-Source Gandiva-Framework existiert grundlegend aus  einen Runtime-Expression-Compiler, welcher auf dem LLVM Projekt basiert, sowie eine hoch hochperformante Laufzeitumgebung.
 Gandiva unterstützt Arrow bei dem Ausführen von Analytischen Funktionen auf Daten, welche in einem Arrow-Format gespeichert sind. 
 Das Framework wurde ursprünglich von dem Unternehmen Dremio entwickelt, welches dieses jedoch an das Apache Arrow Projekt übergeben hat.\cite{Apache:Gandiva}
 
 \subsection{Wie funktioniert Gandiva unter der Haube?}
-Angenommen es existiert eine Anwendung welche Daten mithilfe des  Apache Arrow-Frameworks verarbeitet.Je nach Anforderung dieser Anwendung, wird ein Ausdrucks-Baum (engl. Expression Tree) mithilfe von Gandiva-Klassen erstellt. Dieser Ausdrucksbaum wird nun intern von Gandiva in nativen Code, welcher für die Laufzeitumgebung und Hardware benötigt wird, übersetzt. \\
+Angenommen es existiert eine Anwendung, welche Daten mithilfe des  Apache Arrow-Frameworks verarbeitet.Je nach Anforderung dieser Anwendung, wird ein Ausdrucks-Baum (engl. Expression Tree) mithilfe von Gandiva-Klassen erstellt. Dieser Ausdrucksbaum wird nun intern von Gandiva in nativen Code, welcher für die Laufzeitumgebung und Hardware benötigt wird, übersetzt. \\
 Gandiva ist mithilfe von Apache Arrow in der Lage verschiedene, im Arrow-Spalten-Format abgelegte Daten,weiterzuverarbeiten, zu filtern und auszuwerten.
 Dieser Prozess verläuft hoch optimisiert auf modernen CPU's.\cite{Apache:Gandiva} \\
 Im August 2018 ist es den Ingenieuren von Dremio gelungen eine SQL-Abfrage 70x schneller mithilfe von Gandiva zu verarbeiten. Diese Optimierung ist auf den LLVM-basierten Compiler und das Arrow Spalten-Format zurückzuführen.\cite{Apache:Gandiva:Performance}
@@ -124,22 +124,22 @@ Im August 2018 ist es den Ingenieuren von Dremio gelungen eine SQL-Abfrage 70x s
 \subsection{Beispiel eines Filters}
 \label{Beispiel eines Filters}
 
-Da in dieser Arbeit die Anwendung mit der Programmiersprache Java umgesetzt wird,wird hier auf den Java-Wrapper für Gandiva eingegangen.\\
+Da in dieser Arbeit die Datenbankanwendung mit der Programmiersprache Java umgesetzt wurde ,wird hier auf den Java-Wrapper für Gandiva eingegangen.\\
 Grundsätzlich wird mit Gandiva ein Ausdruck in Form von TreeNodes aufgebaut. TreeNodes ist ein Interface aus dem Package \textbf{org.apache.arrow.gandiva.expression}. Es gibt viele verschiedene Klassen für verschiedene Ausdrücke, welche das TreeNode-Interface implementieren. 
-Beispielsweise gibt es die Klasse AndNode mit der sich einzelne Ausdrücke verknüpfe lassen.
-Einer der wichtigen Klassen zum Bauen eines Ausdrucks ist die TreeBuilder-Klasse.
+Beispielsweise gibt es die Klasse \texttt{AndNode} mit der sich einzelne Ausdrücke verknüpfe lassen.
+Einer der wichtigen Klassen zum Bauen eines Ausdrucks ist die \texttt{TreeBuilder}-Klasse.
 
 \subsubsection{TreeNode-Literal}
-Mithilfe dieser Klasse ist es möglich beispielsweise TreeNode-Literale aus verschiedenen Datentypen zu erstellen. TreeNode-Literale spiegeln einfach nur einen Wert wieder,wie zum Beispiel einen Integer vom Wert fünf oder einen Double vom Wert 5.0. \\
+Mithilfe dieser Klasse ist es möglich beispielsweise \texttt{TreeNode}-Literale aus verschiedenen Datentypen zu erstellen. TreeNode-Literale spiegeln einfach nur einen Wert wieder,wie zum Beispiel einen Integer vom Wert fünf oder einen Double vom Wert 5.0. \\
 
 \subsubsection{TreeNode-Field}
-Das Field-TreeNode bildet den Typ des Vektors bzw. der Spalte der Datenbankanwendung ab und lässt sich ebenfalls über den TreeBuilder mit der Methode \textbf{makeField(Field field)} erstellen.
+Das \texttt{Field}-TreeNode bildet den Typ des Vektors bzw. der Spalte der Datenbankanwendung ab und lässt sich ebenfalls über den TreeBuilder mit der Methode \textbf{makeField(Field field)} erstellen.
 Die Field-Klasse beschreibt lediglich den Namen der Spalte und den Typ.
 
 \subsubsection{TreeNode-Funktion}
 \label{TreeNode-Funktion}
 Ebenso lässt sich eine komplette Funktion in Form eines TreeNodes darstellen.
-Mithilfe des TreeBuilders lässt sich die Methode \textbf{makeFunction()} aufrufen.
+Mithilfe des TreeBuilders lässt sich die Methode \texttt{makeFunction} aufrufen.
 
 \begin{codeblock}{TreeBuilder.java}{Java}
   \begin{javacode}
@@ -149,12 +149,12 @@ Mithilfe des TreeBuilders lässt sich die Methode \textbf{makeFunction()} aufruf
   \end{javacode}
 \end{codeblock}
 
-Der in TreeBuilder.java abgebildeten Funktion wird ein Funktionsname in Form eines Strings übergeben (Zeile 2, TreeBuilder.java). Welche Auswahl es an vorgegeben Funktionsnamen gibt,muss jedoch manuell im Github-Repository nachgeschaut werden. In Abbildung \ref{graf_5} ist die Funktion \glqq{}equal\grqq{} in der Farbe gelb dargestellt.Diese ist eine von vielen bereits implementierten Funktionen im Gandiva Framework.\\
+Der in \texttt{TreeBuilder.java} abgebildeten Funktion, wird ein Funktionsname in Form eines Strings übergeben (Zeile 2, TreeBuilder.java). Welche Auswahl es an vorgegeben Funktionsnamen gibt, muss jedoch manuell im Github-Repository nachgeschaut werden \cite{Github:Arrow:functionregistry}. In Abbildung \ref{graf_5} ist die Funktion \glqq{}equal\grqq{} in der Farbe gelb dargestellt. Diese ist eine von vielen bereits implementierten Funktionen im Gandiva Framework.\\
 
-Ein weiterer Parameter in der Funktion \textbf{makeFunction()} ist eine Liste von TreeNodes.
+Ein weiterer Parameter in der Methode \texttt{makeFunction} ist eine Liste von TreeNodes.
 In dieser Liste von TreeNodes befinden sich alle TreeNodes, welche der in dem String angegeben Funktion übergeben wird.
 In \ref{graf_5} wird verdeutlicht wie das Feld \glqq{}Alter\grqq{} und das Integer-Literal \glqq{}5\grqq{} miteinander durch die Funktion \glqq{}equal\grqq{} verglichen wird. \\
-Schlussendlich wird ein Return-Type ausgewählt,welcher einen ArrowType abbildet. Mit dem ArrowType werden alle primitiven Datentypen, sowie weitere Datentypen wie \glqq{}List, Map, Time\grqq{} usw. abgedeckt.
+Schlussendlich wird ein Return-Type ausgewählt, welcher einen \texttt{ArrowType} abbildet. Mit dem \texttt{ArrowType} werden alle primitiven Datentypen, sowie weitere Datentypen wie \glqq{}List, Map, Time\grqq{} usw. abgedeckt.
 
 \begin{figure}[h]
   \centering
@@ -167,24 +167,16 @@ Schlussendlich wird ein Return-Type ausgewählt,welcher einen ArrowType abbildet
 
 \subsubsection{Filter}
 
-Ein Filter benötigt zuerst ein Schema-Objekt, welches aus einer Liste von Field-Objekten erstellt wird. Ebenso benötigt es ein Condition-TreeNode.
-Hierzu muss wieder mithilfe des TreeBuilders ein Condition-TreeNode mit einer Funktion, wie beispielsweise in \ref{TreeNode-Funktion}, erstellt werden.
-Mithilfe des Filters können dann verschiedene ArrowRecordBatches evaluiert werden.Dies wird in \ref{GandivaProvider-Service} weiter erläutert.
+Ein Filter benötigt zuerst ein \texttt{Schema}-Objekt, welches aus einer Liste von \texttt{Field}-Objekten erstellt wird. Ebenso benötigt es ein \texttt{Condition}-TreeNode.
+Hierzu muss wieder mithilfe der \texttt{TreeBuilder}-Klasse ein \texttt{Condition}-TreeNode mit einer Funktion, wie beispielsweise in \ref{TreeNode-Funktion}, erstellt werden.
+Mithilfe des Filters können dann verschiedene \texttt{ArrowRecordBatche}'s evaluiert werden. Dies wird in \ref{GandivaProvider-Service} weiter erläutert.
 
 \subsection{Motivation}
 
-Mithilfe von Gandiva ist es möglich komplexe Abfragen von Daten zu strukturieren und durch eigene Ausdrücke auszuwerten. Da Gandiva mit dem TreeNode-Interface arbeitet ist es möglich rekursiv unendlich tiefe Ausdrücke zu generieren. In Bezug auf die Index-basierte Datenbankverwaltung lassen sich somit komplexe SQL-Anfragen durch Gandiva performativer verarbeiten, um so eine schnelle Antwort in Form von virtuellen Speicher-Adressen zu garantieren. 
+Mithilfe von Gandiva ist es möglich komplexe Abfragen von Daten zu strukturieren und durch eigene Ausdrücke auszuwerten. Da Gandiva mit dem TreeNode-Interface arbeitet, ist es möglich rekursiv, unendlich tiefe Ausdrücke zu generieren. In Bezug auf die Index-basierte Datenbankverwaltung lassen sich somit komplexe SQL-Anfragen durch Gandiva performativer verarbeiten, um so eine schnelle Antwort in Form von virtuellen Speicher-Adressen zu garantieren. 
 
 
 \section{JSQL}
 
 JSQL ist ein kleines Framework, welches dazu dient SQL-Statements zu parsen und dieses dann in eine Hierarchie von Java-Klassen zu übersetzen.
-Durch Java-Klassen ist es möglch mithilfe des Visitor-Pattern zu navigieren.\cite{wumpz:JSQLParser} 
-
-
-
- 
-
-
-
-(https://db.in.tum.de/teaching/ws1718/seminarHauptspeicherdbs/paper/sterjo.pdf?lang=de)
+Durch die erstellten Java-Klassen ist es dann möglich, mithilfe des Visitor-Pattern, durch diese zu navigieren und das Statement genauer zu betrachten.\cite{wumpz:JSQLParser} 

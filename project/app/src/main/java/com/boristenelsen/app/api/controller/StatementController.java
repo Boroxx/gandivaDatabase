@@ -56,4 +56,14 @@ public class StatementController {
         System.out.println("Time: " + stopwatch.stop());
         return new ResponseEntity<>(indexResponse, HttpStatus.OK);
     }
+
+    @GetMapping("/information")
+    public ResponseEntity<String> tableInformation() throws FileNotFoundException {
+        if(dumpReader==null){
+            return new ResponseEntity<String>("Es wurde keinen Datenbank initialisiert.", HttpStatus.FAILED_DEPENDENCY);
+        }
+        return  new ResponseEntity<String>(dumpReader.getTable().getInfo(), HttpStatus.OK);
+    }
+
+
 }
