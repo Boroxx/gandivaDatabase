@@ -2,21 +2,21 @@
 \label{Einleitung}
 
 \section{Problemstellung}
-Ein Großteil von traditionellen Datenbankanwendungen basieren auf dem Reihen-orientierten Speicherformat. Für große Datensätze auf denen Operationen wie beispielsweise das Summieren von Spalten stattfinden soll, finden sich Performance-Einbussen.
+Ein Großteil von traditionellen Datenbankanwendungen basieren auf dem  Reihen-orien\-tierten Speicherformat. Für große Datensätze auf denen Operationen wie beispielsweise das Summieren von Spalten stattfinden soll, finden sich Performance-Einbussen.
 Mit Hinblick auf die Entwicklung von nicht flüchtigem Speicher (Non Volatile Memory), werden Datenbanken die im Hauptspeicher agieren immer mehr von größerer Bedeutung. Daher ist es notwendig eine Datenbankverwaltung bzw. Anwendung zu implementieren, welche große Datensätze sinnvoll im Hauptspeicher persistiert und mit verschiedenen Anfragen abgefragt werden kann.
 Mithilfe der Technologie Remote Direct Memory Access kann ein Client direkt auf den virtuellen Hauptspeicher eines Servers oder eines anderen Clients zugreifen. Diese Art von Zugriff kann mit der Kommunikation einer Datenbank verbunden werden, indem als Antwort einer Datenbank, nicht der ganze Datensatz über das Netzwerk geliefert wird, sondern nur die einzelnen Speicher-Adressen in Form von Indices mit ihren Offsets und Datentypen.
 
 \section{Ziel der Arbeit}
-Ziel der Arbeit ist es eine Datenbankanwendung basierend auf Apache Arrow/Gandiva zu implementieren, welche unter der Haube mit einem Spalten-Orientierten Speicherformat funktioniert. Die Anwendung soll einen SQL-Dump in den Hauptspeicher einlesen können und auf Anfrage eines Client den Index der Virtuellen Speicher-Adresse zurückgeben. Auf der Datenbank sollen, mithilfe des Frameworks Gandiva, Exressions und Filter ausgewertet werden können.
+Ziel der Arbeit ist es, eine Datenbankanwendung basierend auf Apache Arrow/Gandiva zu implementieren, welche unter der Haube mit einem Spalten-Orientierten Speicherformat funktioniert. Die Anwendung soll einen SQL-Dump in den Hauptspeicher einlesen können und auf Anfrage eines Client den Index der Virtuellen Speicher-Adresse zurückgeben. Auf der Datenbank sollen, mithilfe des Frameworks Gandiva, Exressions und Filter ausgewertet werden können.
 
 Über eine Schnittstelle soll ein Client mit der Datenbankanwendung kommunizieren und Anfragen an diese vornehmen können. Hier wird besonders Fokus auf die Zeitspanne der Initialisierung der Datenbank gelegt.
 
 
 \section{Aufbau der Arbeit}
 
-Die Arbeit besteht aus mehreren Kapiteln. In Kapitel \label{Grundlagen} werden die Grundlagen besprochen, die das Basiswissen bereitstellen,um die darauffolgenden Kapitel wie z.B die Architektur und Implementierung, verstehen zu können.
-In den Grundlagen werden besonders auf die Frameworks Apache Arrow und Gandiva eingegangen,sowie auf das Grundwissen zu Speichertechnologien.\\
-Im Kapitel \ref{Architektur} wird die Architektur der Datenbankanwendung  beschrieben und auf die verschiedenen Technologien dahinter eingegangen. Darauf folgt das Kapitel \ref{Implementierung} , welches die Implementierung der Architektur, sowie einige Features der Anwendung und das Zusammenspiel der Komponenten beschreibt. 
+Die Arbeit besteht aus mehreren Kapiteln. In Kapitel \ref{Grundlagen} werden die Grundlagen besprochen, die das Basiswissen bereitstellen, um die darauffolgenden Kapitel wie z.B. die Architektur und Implementierung, verstehen zu können.
+In den Grundlagen werden besonders auf die Frameworks Apache Arrow und Gandiva eingegangen, sowie auf das Grundwissen zu Speichertechnologien.\\
+Im Kapitel \ref{Architektur} wird die Architektur der Datenbankanwendung  beschrieben und auf die verschiedenen Technologien dahinter eingegangen. Darauf folgt das Kapitel \ref{Implementierung}, welches die Implementierung der Architektur, sowie einige Features der Anwendung und das Zusammenspiel der Komponenten beschreibt. 
 Im Kapitel \ref{Client} wird der Client beschrieben und ein Anwendungsfall aufgezeigt. Hier ist es möglich die Anwendung selbst einmal auszuprobieren.
 Anschließend werden verschiedene Messergebnisse im Kapitel \ref{Evaluierung} diskutiert und es wird ein Fazit über die Performance der Anwendung gezogen.
 Abschließend gibt es eine Zusammenfassung, sowie einen Ausblick auf die Datenbankanwendung und ihren Anwendungsfall, in Kapitel \ref{Zusammenfassung}. 

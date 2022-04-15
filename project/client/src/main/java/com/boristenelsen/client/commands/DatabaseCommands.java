@@ -50,8 +50,9 @@ public class DatabaseCommands {
         String response;
         try {
            HttpResponse httpResponse = httpClient.execute(httpGet);
-           response = httpResponse.toString();
+            String jsonString = EntityUtils.toString(httpResponse.getEntity());
            this.StatementBlocker = false;
+           return jsonString;
         } catch (IOException e) {
            response= e.toString();
         }
@@ -60,9 +61,36 @@ public class DatabaseCommands {
 
     @ShellMethod("Liste aller auf dem Server liegenden Dumps.")
     public String listDumps(){
-        System.out.println("Host: " + host + " port: " + port);
-        return "Table information";
+        String reqURL = "http://"+host+":"+port;
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet httpGet = new HttpGet(reqURL+"/listDumps");
+        String response;
+        try {
+            HttpResponse httpResponse = httpClient.execute(httpGet);
+            String jsonString = EntityUtils.toString(httpResponse.getEntity());
+            return jsonString;
+        } catch (IOException e) {
+            response= e.toString();
+        }
+        return response;
     }
+
+    @ShellMethod("Wähle Dump über die ID aus.")
+    public String choose(@ShellOption String id){
+        String reqURL = "http://"+host+":"+port;
+        HttpClient httpClient = HttpClientBuilder.create().build();
+        HttpGet httpGet = new HttpGet(reqURL+"/"+id);
+        String response;
+        try {
+            HttpResponse httpResponse = httpClient.execute(httpGet);
+            String jsonString = EntityUtils.toString(httpResponse.getEntity());
+            return jsonString;
+        } catch (IOException e) {
+            response= e.toString();
+        }
+        return response;
+    }
+
 
     @ShellMethod("Sende SQL Statement")
     public String send(@ShellOption String statement){

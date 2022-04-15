@@ -2,11 +2,11 @@
 \label{Evaluierung}
 \section{Index-basierte Messungen}
 
-Ein Ziel der Arbeit ist es Daten in einer Datenbank schnell,performant und Index-basiert abzufragen.
-Um auf die Schnelligkeit der Datenbankanwendung einzugehen wurden verschiedene Messungen in Betracht gezogen.
+Ein Ziel der Arbeit ist es Daten in einer Datenbank schnell, performant und Index-basiert abzufragen.
+Um auf die Schnelligkeit der Datenbankanwendung einzugehen, wurden verschiedene Messungen in Betracht gezogen.
 
-In den folgenden Messungen wurde die Latenz zwischen Client und Server außer Acht gelassen, da diese sehr stark vom Netzwerk abhängig ist. Da die Anfragen hier über einen Webserver entgegen genommen werden und man mit Aussicht in Richtung RDMA, im gleichen Netzwerk arbeitet, sollte die Latenz vermutlich nicht all zu hoch ausfallen.
-Um die Zeit zwischen eines Zugriffs auf die Datenbankanwendung bis zur Antwort zu messen, wurde eine \texttt{StopWatch} vor dem Aufruf der Methode \texttt{checkStatementToMethod(String Statement, Table table)} eingeschaltet.
+In den folgenden Messungen wurde die Latenz zwischen Client und Server außer Acht gelassen, da diese sehr stark vom Netzwerk abhängig ist. Da die Anfragen hier über einen Webserver entgegen genommen werden und mit Aussicht in Richtung RDMA, im gleichen Netzwerk gearbeitet wird, sollte die Latenz vermutlich nicht all zu hoch ausfallen.
+Um die Zeit eines eines Zugriffs auf die Datenbankanwendung bis zur Antwort zu messen, wurde eine \texttt{StopWatch} vor dem Aufruf der Methode \\ \texttt{checkStatementToMethod(String Statement, Table table)} eingeschaltet.
 Die Messungen wurden mithilfe von drei SQL-Dumps getätigt. Jeder SQL-Dump enthält eine unterschiedliche Anzahl an Dateneinträgen.
 
 \subsection{Messumgebung}
@@ -42,7 +42,7 @@ Die Ergebnisse aus \ref{tabelle_avarage_time} zeigen, dass sich Dauer der Initia
 
 \subsection{Datenbank-Anfragen}
 
-In den folgenden Messungen werden drei verschiedene Datenanfragen auf einem Datensatz angewendet, welcher aus zwei Spalten besteht. Eine dieser Spalten bildet eine Zahl ab, welche auf einen Wert, mithilfe der Datenbankanfrage, gefiltert wird.
+In den folgenden Messungen werden drei verschiedene Datenanfragen auf einem Datensatz angewendet, der aus zwei Spalten besteht. Eine dieser Spalten bildet eine Zahl ab, die auf einen Wert, mithilfe der Datenbankanfrage, gefiltert wird.
 
 \begin{table}[H]
 \begin{center}
@@ -62,8 +62,8 @@ In den folgenden Messungen werden drei verschiedene Datenanfragen auf einem Date
 \label{equalTabelle}
 \end{table}
 
-In den Ergebnissen aus der Tabelle\ref{equalTabelle} sieht man, dass die erste Abfrage der Datenbank deutlich mehr Zeit benötigt,als die darauffolgenden. Dies kann damit zusammenhängen, dass Gandiva benötigte Ressource, während der ersten Anfrage, erstmalig lädt und diese dann für die nächsten Anfragen griffbereit hat.
-Schaut man sich die Messungen genauer an, wird deutlich, dass obwohl die Datensätze größer werden, keine großen Änderung bei der Dauer der Anfrage im Durchschnitt existieren.\\
+In den Ergebnissen aus der Tabelle \ref{equalTabelle} kann festgestellt werden, dass die erste Abfrage der Datenbank deutlich mehr Zeit benötigt, als die darauffolgenden. Dies kann damit zusammenhängen, dass Gandiva benötigte Ressource, während der ersten Anfrage, erstmalig lädt und diese anschließend für die nächsten Anfragen griffbereit hat.
+Werden die Messungen genauer betrachtet, wird deutlich, dass obwohl die Datensätze größer werden, keine großen Änderung bei der Dauer der Anfrage im Durchschnitt existieren.\\
 Weitere Operatoren wie \texttt{greaterThan} oder \texttt{lowerThan} werden hier nicht betrachtet, da diese auf der gleichen Implementierung basieren und circa die gleichen durchschnittlichen Messwerte abdecken.
 
 \subsection{Fazit der Messungen}
@@ -71,9 +71,9 @@ Weitere Operatoren wie \texttt{greaterThan} oder \texttt{lowerThan} werden hier 
 Um die Performance der Datenbankanwendung gegen eine Datenbank wie zum Beispiel die H2-Datenbank, realistisch testen zu können, müsste die Datenbankanwendung der Arbeit die gleichen Features unterstützen. Ansonsten könnte kein fairer Vergleich stattfinden. Hier ist zu sagen, dass diese Datenbankanwendung auf einen spezifischen Fall zugeschnitten wurde. Es werden nur die Memory-Adressen mit ihren Offsets als Datenantwort zurückgeliefert und nicht die Daten selber. 
 Dies bedeutet, dass die Messungen im Vergleich zu Messungen von Datenbanken aus der echten Welt, erst die Hälfte des Prozesses hinter sich haben. 
 
-Damit solch eine Messungen valide sind, müsste man mithilfe von Remote-Direct-Memory-Access auf den Hauptspeicher im Netzwerk zugreifen und diese Zeit des Zugriffs, auf die Zeit der Anfrage, dazu addieren.
+Damit solch eine Messungen valide sind, müsste mithilfe von Remote-Direct-Memory-Access auf den Hauptspeicher im Netzwerk zugegriffen werden und diese Zeit des Zugriffs, auf die Zeit der Anfrage, dazu addiert werden.
 
-Ebenfalls könnte man einen großen Performance-Vorteil erkennen, wenn die Operation einer Summierung von Spalten in der Datenbankanwendung implementiert werden würde.\\
+Ebenfalls könnte ein großer Performance-Vorteil erkannt werden, wenn die Operation einer Summierung von Spalten in der Datenbankanwendung implementiert werden würde.\\
 Diese Aussage deckt sich dadurch, dass Apache Arrow ein Spalten-Format zur Persistenz der Daten im Hauptspeicher benutzt.
 
 

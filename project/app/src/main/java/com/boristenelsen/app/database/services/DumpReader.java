@@ -68,11 +68,7 @@ public class DumpReader {
             }
         }
 
-        Runtime runtime = Runtime.getRuntime();
-        runtime.gc();
-        long memory = runtime.totalMemory() - runtime.freeMemory();
-        System.out.println("Benutzer Speicher in Bytes: " + memory);
-        System.out.println("Benutzer Speicher in MB: " + bytesToMegabytes(memory));
+
     }
     public static long bytesToMegabytes(long bytes) {
         return bytes / (1024L * 1024L);
@@ -81,8 +77,6 @@ public class DumpReader {
     public Table parseCreateTableStmt(String stmt) throws JSQLParserException {
         Statement parse = CCJSqlParserUtil.parse(stmt);
         CreateTable ct = (CreateTable) parse;
-        System.out.println("table=" + ct.getTable().getFullyQualifiedName());
-
         List<Field> fieldList = new ArrayList<>();
 
         for (ColumnDefinition colDef : ct.getColumnDefinitions()) {
@@ -118,7 +112,6 @@ public class DumpReader {
     public  void prepareDataForMemory(String stmt,Table table) throws Exception {
         Statement parse = CCJSqlParserUtil.parse(stmt);
         Insert insert = (Insert) parse;
-        insert.getColumns().forEach(System.out::println);
         ItemsList items = insert.getItemsList();
 
         //Insert Statement enthält mehrere Expressions, welche Schema abhängig sind. Schema ist immer größer als Column im Insert Statement da ID Spalte zusätzlich hinzukommt

@@ -7,7 +7,7 @@ import org.apache.arrow.gandiva.evaluator.SelectionVector;
 public class MemoryUtil {
 
     public static void printLongAsAdress(Long address){
-        System.out.println(Long.toHexString(address));
+        System.out.println("Zugriff auf Vektor-Memory @: " + Long.toHexString(address));
 
     }
 
