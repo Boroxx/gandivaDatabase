@@ -148,7 +148,7 @@ Der \texttt{DumpReader} kümmert sich letztendlich um die Initialisierung eines 
 
 \subsection{SqlMethodProvider-Service}
 \label{SqlMethodProvider-Service}
-Anfragen über die Datenbank laufen vom StatementController aus in den SqlMethodProvider-Service. Dieser ist dafür zuständig das SQL-Statement und somit die Datenanfrage auszuwerten.
+Anfragen über die Datenbank laufen vom StatementController aus in den \\ SqlMethodProvider-Service. Dieser ist dafür zuständig das SQL-Statement und somit die Datenanfrage auszuwerten.
 
 Alle Anfragen in Form von Statements werden von einer Verteiler-Methode aus an weitere Methoden verteilt und von dem Statement abhängig ausgewertet.
 Die Verteiler-Methode \texttt{checkStatementToMethod(String statement, Table table)} bekommt das Statement als String, sowie das Table-Objekt aus dem DumpReader-Service, übergeben. In der Arbeit wird nur mit einem einzelnen Table gearbeitet, somit findet hier keine Logik für die Auswahl eines Tables statt. Jedoch lässt sich dieses Feature einfach erweitern. Weiteres dazu in Abschnitt Erweiterungen.\\
