@@ -1,4 +1,4 @@
-# SETUP mithilfe von Artefakten
+# Client und Datenbankanwendung Setup
 
 Um die datenbankanwendung.jar in /projects/artefacts nutzen zu können wird das Betriebssystem Linux benötigt, da ein Gandiva-Artefakt
 manuell in die Anwendung per Gradle eingebunden wurde, aufgrund von Kompatibiliätsproblemen. (Apache Gandiva)
@@ -18,9 +18,11 @@ Der Client kann unabhängig von der Datenbankanwendung gestartet werden. Der Bef
 Die Parameter db.host und db.port können nach belieben ausgetauscht werden. Je nachdem auf welchem Port die Datenbankanwendung läuft.
 Sobald die jar-Datei ausgeführt wurde, kann im Client der Befehl help benutzt werden um eine Übersicht der Database Commands zu erhalten.
 
-#SETUP über IDEA
+# Entwicklungsumgebung Setup
 Im /app und /client Folder können die Anwendungen als Gradle-Projekt in eine beliebige IDEA importiert werden und von dort aus direkt
 gestartet wereden.
+Achtung! Da die Client Anwendung auf Spring Shell basiert könnte es zu Fehlern in der Konsole der Entwicklungsumgebung kommen.
+Daher ist es besser die Client Anwendung über die Konsole zu starten.
 
 # Client Workflow:
 
