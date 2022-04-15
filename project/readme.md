@@ -11,14 +11,14 @@ Hierzu sollten vom Repo-Folder aus folgende Befehle verwendet werden:
 
 Die Datenbankanwendung kann mithilfe des Befehls:
 
-		sudo java -jar /projects/artefacts/datenbankanwendung.jar --db.root=/tmp
+		sudo java -jar /project/artefacts/datenbankanwendung.jar --db.root=/tmp
 
 
 (Parameter db.root enthält den Pfad zum Ordner, indem die SQL-Dumps gescannt werden.)
 
 Der Client kann unabhängig von der Datenbankanwendung gestartet werden. Der Befehl dazu lautet:
 
-		sudo java -jar /projects/artefacts/client.jar --db.host=localhost --db.port=8080
+		sudo java -jar /project/artefacts/client.jar --db.host=localhost --db.port=8080
 
 Die Parameter db.host und db.port können nach belieben ausgetauscht werden. Je nachdem auf welchem Port die Datenbankanwendung läuft.
 Sobald die jar-Datei ausgeführt wurde, kann im Client der Befehl help benutzt werden um eine Übersicht der Database Commands zu erhalten.
